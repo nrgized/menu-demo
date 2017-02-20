@@ -686,21 +686,21 @@ function getHTTPinfo(sender) {
 
             console.log(place);
 
-        /*    element = {
-              title: car.brand,
-              subtitle: car.plateNr,
-              item_url: car.bookUrl,               
-              image_url: car.imageUrl,
+            element = {
+              title: place.title,
+              subtitle: place.title,
+              item_url: place.fblink,               
+              image_url: place.img,
               buttons: [{
                 type: "web_url",
-                url: car.bookUrl,
+                url: place.fblink,
                 title: "Rezervuoti"
               }, {
                 type: "postback",
                 title: "Call Postback",
                 payload: "Payload for first bubble"
               }],
-            }; */
+            }; 
             elements.push(element);
           });
           
