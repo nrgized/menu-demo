@@ -98,10 +98,10 @@ app.post('/webhook/', function (req, res) {
             if (att[0].type === "location") {
               UserLat = event.message.attachments[0].payload.coordinates.lat;
               UserLng = event.message.attachments[0].payload.coordinates.long;
-              sendTextMessage(sender, "Ačiū. Ieškau artimiausių automobilių...");
+              sendTextMessage(sender, "Ačiū. Ieškau artimiausios maitinimo įstaigos");
               console.log(UserLat);
               console.log(UserLng);
-              getNearestCars(UserLat, UserLng);
+              getNearestPlace(UserLat, UserLng);
             }
             if (att[0].type === "image") {
               console.log("image");
@@ -639,19 +639,20 @@ function changeThreadSettings() {
           call_to_actions:[
             {
               "type":"postback",
-              "title":"Pasirinkti tipa",
-              "payload":"select"
+              "title":"Pasirinkti maitinimo įstaigos tipą",
+              "payload":"select_type"
             },
             {
               "type":"postback",
-              "title":"Ieškoti artimiausio",
-              "payload":"search"
+              "title":"Pasirinkti maitinimo įstaigas pagal kainą",
+              "payload":"select_price"
             },
             {
-              "type":"web_url",
-              "title":"View Website",
-              "url":"http://petersapparel.parseapp.com/"
+              "type":"postback",
+              "title":"Ieškoti artimiausios vietos",
+              "payload":"select_location"
             }
+
           ]
         }
     }, function(error, response, body) {
