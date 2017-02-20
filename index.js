@@ -639,12 +639,12 @@ function changeThreadSettings() {
           call_to_actions:[
             {
               "type":"postback",
-              "title":"Pasirinkti maitinimo įstaigos tipą",
+              "title":"Pasirinkti pagal tipą",
               "payload":"select_type"
             },
             {
               "type":"postback",
-              "title":"Pasirinkti maitinimo įstaigas pagal kainą",
+              "title":"Pasirinkti pagal kainą",
               "payload":"select_price"
             },
             {
