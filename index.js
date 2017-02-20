@@ -122,28 +122,11 @@ app.post('/webhook/', function (req, res) {
                 changeThreadSettings();
             continue
             }
-            if (text === 'praktiški' || text === 'praktiski') {
-              userOptions[sender] = {id: sender, type: "practical"}
-              askLocation();
+            if (text === 'check') {
+                getHTTPinfo(sender);
             continue
             }
-            if (text === 'komfortiški' || text === 'komfortiski') {
-              userOptions[sender] = {id: sender, type: "comfort"}
-              console.log(userOptions[sender].type);
-              askLocation();
-
-            continue
-            }
-            if (text === 'krovininiai') {
-              userOptions[sender] = {id: sender, type: "cargo"}
-              askLocation();
-            continue
-            }
-            if (text === 'rinktiniai') {
-              userOptions[sender] = {id: sender, type: "premium"}
-              askLocation();
-            continue
-            }
+    
             if (text.charAt(0) == '#') {
                 console.log("groteles");
                 var matches = [];
@@ -672,12 +655,9 @@ function changeThreadSettings() {
 
 
 
-function getHTTPinfo(sender, value) {
-        var url = "https://login.citybee.lt/lt/map/zone/" + value;
+function getHTTPinfo(sender) {
+        var url = "http://baranovas.lt/data.html";
         request({
-          headers: {
-                'Cookie': 'PHPSESSID=8m3an6jv3vtmurj9pv1u9a0od3; device_view=full; BCSI-CS-97976de0be87e764=2; BIGipServerglosC-proxyVIP-bc-RBB-web_gdcsfscs05-55_8050_pool=3242406179.29215.0000; _ga=GA1.2.500491733.1468570414; BCSI-CS-b933f65a4f518259=2; BIGipServerSlough-proxyVIP-bc-RBB-web-SLGSFSCS105-155_8050_pool=3778638102.29215.0000; __utmt=1; __utma=269912044.500491733.1468570414.1468570425.1468587689.2; __utmb=269912044.4.10.1468587689; __utmc=269912044; __utmz=269912044.1468587689.2.2.utmcsr=citybee.lt|utmccn=(referral)|utmcmd=referral|utmcct=/lt/'
-          },
           uri: url,
           method: "POST",
           timeout: 100000,
@@ -690,24 +670,23 @@ function getHTTPinfo(sender, value) {
           console.log('here');
           console.log(url);
 
-          var cars = [];
-          var car = {};
+          var places = [];
+          var place = {};
           var element = {};
           var elements = [];
 
-          $('li').each(function(i, elem) {
-            car.brand = $(this).find('.brand').text();
-            car.id = $(this).find( "input[name*='car-id']" ).attr('value');
-            var imageUrlFull = $(this).find('.car-icon-div').attr('style');
-            var substringStart = imageUrlFull.indexOf("(") + 2;
-            var substringEnd = imageUrlFull.indexOf(")") - 1;
-            console.log(imageUrlFull);
-            console.log(substringStart);
-            car.imageUrl = imageUrlFull.substring(substringStart, substringEnd);
-            car.bookUrl = 'https://login.citybee.lt/mobile/lt/reservation/create/' + car.id;
-            car.plateNr = "XXX000";
-            cars.push(car); 
-            element = {
+          $('div .place-item').each(function(i, elem) {
+            place.title = $(this).find('.title').text();
+            place.price = $(this).find('.pricerange').text();
+            place.type = $(this).find('.type').text();
+            place.address = $(this).find('.address').text();
+            place.fblink = $(this).find('.fblink').attr('href');
+            place.img = $(this).find('.img').attr('src');
+            places.push(place);
+
+            console.log(place);
+
+        /*    element = {
               title: car.brand,
               subtitle: car.plateNr,
               item_url: car.bookUrl,               
@@ -721,7 +700,7 @@ function getHTTPinfo(sender, value) {
                 title: "Call Postback",
                 payload: "Payload for first bubble"
               }],
-            };
+            }; */
             elements.push(element);
           });
           
@@ -740,10 +719,10 @@ function getHTTPinfo(sender, value) {
               }
             };  
 //            sendTextMessage(sender, cars[0].imageUrl);
-        if(cars.length > 0){   
+        if(places.length > 0){   
           callSendAPI(messageData);
         }else{
-          sendTextMessage(sender, "atsiprašome, " + value + " stotelėje šiuo metu nėra laisvų automobilių");
+          sendTextMessage(sender, "atsiprašome, nieko neradome");
         }
         
 
