@@ -693,8 +693,17 @@ function getClosestLocation(UserLat, UserLng) {
           console.log(places[0].walkdistance);
           console.log(places[1].walkdistance);
 
+          sendClosestLocations(Origin)
 
-         function sendClosestLocations(Origin) {
+
+          } else {
+              // http request failing
+            console.error("error on API request");
+            console.log('error');
+          }
+        }); 
+
+        function sendClosestLocations(Origin) {
 
           var elements = [];
           var element = {};
@@ -739,12 +748,6 @@ function getClosestLocation(UserLat, UserLng) {
           //console.log(JSON.stringify(messageData, null, 4));
           callSendAPI(messageData);
         }
-          } else {
-              // http request failing
-            console.error("error on API request");
-            console.log('error');
-          }
-        }); 
     });
 };
 
