@@ -562,79 +562,148 @@ function getNearestCars(UserLat, UserLng) {
 // get info
 
 function getClosestLocation(UserLat, UserLng) {
-        var url = "http://baranovas.lt/data.html";
+  var url = "http://baranovas.lt/data.html";
+  request({
+    uri: url,
+    method: "POST",
+    timeout: 100000,
+    followRedirect: true,
+    maxRedirects: 10
+  }, function(error, response, body) {
+      var cheerio = require('cheerio'),
+      $ = cheerio.load(body);        
+      console.log('here');
+      console.log(url);
+
+      var places = [];
+      var place = {};
+      var element = {};
+      var elements = [];
+
+      $('div .place-item').each(function(i, elem) {
+        place.title = $(this).find('.title').text();
+        place.price = $(this).find('.pricerange').text();
+        place.type = $(this).find('.type').text();
+        place.address = $(this).find('.address').text();
+        place.fblink = $(this).find('.fblink').attr('href');
+        place.img = $(this).find('.img').attr('src');
+        place.lat = $(this).find('.address').attr('lat');
+        place.lon = $(this).find('.address').attr('long');
+        places.push(place);
+        place = {};
+      });
+      var OriginLat = UserLat;
+      var OriginLong = UserLng;
+      var p = 0.017453292519943295;    // Math.PI / 180
+      var c = Math.cos;
+      // loop through places array calculate and add distance
+      for (i = 0; i < places.length; i++) {
+        var lat1 = OriginLat;
+        var lon1 = OriginLong;
+        var lat2 = places[i].lat;
+        var lon2 = places[i].lon;
+
+        // distance calculation
+          var a = 0.5 - c((lat2 - lat1) * p)/2 + 
+                  c(lat1 * p) * c(lat2 * p) * 
+                  (1 - c((lon2 - lon1) * p))/2;
+          places[i].distance = 12742 * Math.asin(Math.sqrt(a));
+          places[i].walkdistance = "";
+          places[i].walkdistanceval = "";
+
+      }
+      // sort carlocations array by distance
+
+      places.sort(function (a, b) {
+        if (a.distance > b.distance) {
+          return 1;
+        }
+        if (a.distance < b.distance) {
+          return -1;
+        }
+        // a must be equal to b
+        return 0;
+        });
+
+      for (i = 0; i < 5; i++) {
+        console.log(places[i].title);
+        console.log(places[i].distance);
+      }
+    // run 10 nearest cars through google maps API to identify walking distance
+        var googleAPIkey = "AIzaSyBi5yJFId0hOqgw-_gw2R-SQJtqf3zE2hU";
+        var Origin = OriginLat + "," + OriginLong;
+        var Destinations = "";
+        var z;
+        if (carlocations.length >= 25) { z=25 } else { z=carlocations.length}
+          // loop through carlocations array to generate API url
+        for (i = 0; i < z; i++) {
+          Destinations += places[i].lat;
+          Destinations += ",";
+          Destinations += places[i].lon;
+          Destinations += "|";
+        }
+        Destinations = Destinations.substring(0, Destinations.lastIndexOf("|"));
+          // googleAPI distance matrix call
+        var url = 'https://maps.googleapis.com/maps/api/distancematrix/json?origins=' + Origin + '&destinations=' + Destinations + '&mode=walking&language=lt-LT&key=' + googleAPIkey;
+        console.log (url);
+
+          // api Call
         request({
+          headers: {},
           uri: url,
-          method: "POST",
-          timeout: 100000,
+          method: "GET",
+          timeout: 10000,
           followRedirect: true,
           maxRedirects: 10
-        }, function(error, response, body) {
-          var cheerio = require('cheerio'),
-          $ = cheerio.load(body);        
-          console.log('here');
-          console.log(url);
+        }, function (error, response, body) {
+          if (!error && response.statusCode == 200) {
+            // acction on HTTP request success
 
-          var places = [];
-          var place = {};
-          var element = {};
-          var elements = [];
+            console.log('Google API http success');
+            
+            var distanceDetails = JSON.parse(body);
+            console.log(distanceDetails);
+            // add walking distance to 10 nearest stations if 10 exists
 
-          $('div .place-item').each(function(i, elem) {
-            place.title = $(this).find('.title').text();
-            place.price = $(this).find('.pricerange').text();
-            place.type = $(this).find('.type').text();
-            place.address = $(this).find('.address').text();
-            place.fblink = $(this).find('.fblink').attr('href');
-            place.img = $(this).find('.img').attr('src');
-            place.lat = $(this).find('.address').attr('lat');
-            place.lon = $(this).find('.address').attr('long');
-            places.push(place);
-            place = {};
-            console.log(place);
-          });
-            console.log(places[3]);
+            for (i = 0; i < z; i++) {
+                places[i].walkdistance = distanceDetails.rows[0].elements[i].duration.text;
+                places[i].walkdistanceval = distanceDetails.rows[0].elements[i].distance.value;
+
+              }
+
+        // leave only z elements in array
+
+        
+        places.splice(z, carlocations.length - z);
 
 
-          var OriginLat = UserLat;
-          var OriginLong = UserLng;
-          var p = 0.017453292519943295;    // Math.PI / 180
-          var c = Math.cos;
-          // loop through places array calculate and add distance
-          for (i = 0; i < places.length; i++) {
-            var lat1 = OriginLat;
-            var lon1 = OriginLong;
-            var lat2 = places[i].lat;
-            var lon2 = places[i].lon;
+        // sort carlocations array by walking distance
 
-            // distance calculation
-              var a = 0.5 - c((lat2 - lat1) * p)/2 + 
-                      c(lat1 * p) * c(lat2 * p) * 
-                      (1 - c((lon2 - lon1) * p))/2;
-              places[i].distance = 12742 * Math.asin(Math.sqrt(a));
-              places[i].walkdistance = "";
-              places[i].walkdistanceval = "";
-
+        places.sort(function (a, b) {
+          if (a.walkdistanceval > b.walkdistanceval) {
+            return 1;
           }
-          // sort carlocations array by distance
-
-          places.sort(function (a, b) {
-            if (a.distance > b.distance) {
-              return 1;
-            }
-            if (a.distance < b.distance) {
-              return -1;
-            }
-            // a must be equal to b
-            return 0;
-            });
-
-          for (i = 0; i < 5; i++) {
-            console.log(places[i].title);
-            console.log(places[i].distance);
+          if (a.walkdistanceval < b.walkdistanceval) {
+            return -1;
           }
-
+          if (a.walkdistanceval = "") {
+            return 1;
+          }
+          // a must be equal to b
+          return 0;
         });
+          console.log(places[0].walkdistanceval);
+          console.log(places[1].walkdistanceval);
+          console.log(places[0].walkdistance);
+          console.log(places[1].walkdistance);
+         //   sendNearestCars(Origin);
+          } else {
+              // http request failing
+            console.error("error on API request");
+            console.log('error');
+          }
+        }); 
+    });
 };
 
 
