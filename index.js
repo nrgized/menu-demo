@@ -590,6 +590,7 @@ function getClosestLocation(UserLat, UserLng) {
             place.lat = $(this).find('.address').attr('lat');
             place.lon = $(this).find('.address').attr('long');
             places.push(place);
+            console.log(place);
           });
           console.log(places);
 
