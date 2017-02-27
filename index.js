@@ -682,6 +682,8 @@ function getHTTPinfo(sender) {
             place.address = $(this).find('.address').text();
             place.fblink = $(this).find('.fblink').attr('href');
             place.img = $(this).find('.img').attr('src');
+            place.lat = $(this).find('.address').attr('lat');
+            place.long = $(this).find('.address').attr('long');
             places.push(place);
 
             console.log(place);
