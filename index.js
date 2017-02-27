@@ -674,7 +674,7 @@ function getClosestLocation(UserLat, UserLng) {
         // leave only z elements in array
 
         
-        places.splice(z, carlocations.length - z);
+        places.splice(z, places.length - z);
 
 
         // sort carlocations array by walking distance
