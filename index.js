@@ -101,7 +101,7 @@ app.post('/webhook/', function (req, res) {
               sendTextMessage(sender, "Ačiū. Ieškau artimiausios maitinimo įstaigos");
               console.log(UserLat);
               console.log(UserLng);
-              getNearestPlace(UserLat, UserLng);
+              getClosestLocation(UserLat, UserLng)
             }
             if (att[0].type === "image") {
               console.log("image");
@@ -559,7 +559,89 @@ function getNearestCars(UserLat, UserLng) {
 
 }
 
- 
+// get info
+
+function getClosestLocation(UserLat, UserLng) {
+        var url = "http://baranovas.lt/data.html";
+        request({
+          uri: url,
+          method: "POST",
+          timeout: 100000,
+          followRedirect: true,
+          maxRedirects: 10
+        }, function(error, response, body) {
+          var cheerio = require('cheerio'),
+          $ = cheerio.load(body);
+          var text = $('.brand').text();          
+          console.log('here');
+          console.log(url);
+
+          var places = [];
+          var place = {};
+          var element = {};
+          var elements = [];
+
+          $('div .place-item').each(function(i, elem) {
+            place.title = $(this).find('.title').text();
+            place.price = $(this).find('.pricerange').text();
+            place.type = $(this).find('.type').text();
+            place.address = $(this).find('.address').text();
+            place.fblink = $(this).find('.fblink').attr('href');
+            place.img = $(this).find('.img').attr('src');
+            place.lat = $(this).find('.address').attr('lat');
+            place.long = $(this).find('.address').attr('long');
+            places.push(place);
+          });
+
+          var OriginLat = UserLat;
+          var OriginLong = UserLng;
+          var p = 0.017453292519943295;    // Math.PI / 180
+          var c = Math.cos;
+          // loop through places array calculate and add distance
+          for (i = 0; i < places.length; i++) {
+            var lat1 = OriginLat;
+            var lon1 = OriginLong;
+            var lat2 = places[i].lat;
+            var lon2 = places[i].lon;
+
+            // distance calculation
+              var a = 0.5 - c((lat2 - lat1) * p)/2 + 
+                      c(lat1 * p) * c(lat2 * p) * 
+                      (1 - c((lon2 - lon1) * p))/2;
+              places[i].distance = 12742 * Math.asin(Math.sqrt(a));
+              places[i].walkdistance = "";
+              places[i].walkdistanceval = "";
+
+          }
+          // sort carlocations array by distance
+
+          places.sort(function (a, b) {
+            if (a.distance > b.distance) {
+              return 1;
+            }
+            if (a.distance < b.distance) {
+              return -1;
+            }
+            // a must be equal to b
+            return 0;
+            });
+
+          for (i = 0; i < 5; i++) {
+            console.log(places[i].title);
+            console.log(places[i]).distance;
+          }
+
+        });
+      };
+
+
+
+// find nearest location
+
+
+
+
+// end of find nearest location 
 
 
 // function to send generic messages
