@@ -592,7 +592,10 @@ function getClosestLocation(UserLat, UserLng) {
             places.push(place);
             console.log(place);
           });
-          console.log(places);
+          console.log(places[1].title);
+          console.log(places[2].title);
+          console.log(places[3].title);
+
 
           var OriginLat = UserLat;
           var OriginLong = UserLng;
