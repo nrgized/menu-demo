@@ -634,7 +634,7 @@ function getClosestLocation(UserLat, UserLng) {
         var Origin = OriginLat + "," + OriginLong;
         var Destinations = "";
         var z;
-        if (carlocations.length >= 25) { z=25 } else { z=carlocations.length}
+        if (places.length >= 25) { z=25 } else { z=places.length}
           // loop through carlocations array to generate API url
         for (i = 0; i < z; i++) {
           Destinations += places[i].lat;
