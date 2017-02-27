@@ -625,10 +625,6 @@ function getClosestLocation(UserLat, UserLng) {
         return 0;
         });
 
-      for (i = 0; i < 5; i++) {
-        console.log(places[i].title);
-        console.log(places[i].distance);
-      }
     // run 10 nearest cars through google maps API to identify walking distance
         var googleAPIkey = "AIzaSyBi5yJFId0hOqgw-_gw2R-SQJtqf3zE2hU";
         var Origin = OriginLat + "," + OriginLong;
@@ -696,7 +692,53 @@ function getClosestLocation(UserLat, UserLng) {
           console.log(places[1].walkdistanceval);
           console.log(places[0].walkdistance);
           console.log(places[1].walkdistance);
-         //   sendNearestCars(Origin);
+
+
+         function sendClosestLocations(Origin) {
+
+          var elements = [];
+          var element = {};
+          for (i = 0; i < 5; i++) {
+            element = {
+                title: places[i].title,
+                subtitle: places[i].address + ' (' + carlocations[i].walkdistance + ' )',
+                item_url: places[i].fblink,            
+                image_url: places[i].img,
+                buttons: [{
+                  type: "web_url",
+                  url: places[i].fblink,    
+                  title: "Rezervuoti"
+                }, {
+                  type: "web_url",
+                  url: 'https://www.google.com/maps/dir/' + Origin + '/' + places[i].lat + "," + places[i].lon + '/data=!4m2!4m1!3e2',
+                  title: "Keliauti",
+                }],
+              };
+              elements.push(element);
+            element = "";
+          }
+          
+          // message format
+
+          var messageData = {
+            recipient: {
+              id: sender
+            },
+            message: {
+              attachment: {
+                type: "template",
+                payload: {
+                  template_type: "generic",
+                  elements: []
+                }
+              }
+            }
+          };
+
+          messageData.message.attachment.payload.elements = elements;  
+          //console.log(JSON.stringify(messageData, null, 4));
+          callSendAPI(messageData);
+        }
           } else {
               // http request failing
             console.error("error on API request");
