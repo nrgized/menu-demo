@@ -589,9 +589,10 @@ function getClosestLocation(UserLat, UserLng) {
             place.fblink = $(this).find('.fblink').attr('href');
             place.img = $(this).find('.img').attr('src');
             place.lat = $(this).find('.address').attr('lat');
-            place.long = $(this).find('.address').attr('long');
+            place.lon = $(this).find('.address').attr('long');
             places.push(place);
           });
+          console.log(places.length);
 
           var OriginLat = UserLat;
           var OriginLong = UserLng;
