@@ -571,8 +571,7 @@ function getClosestLocation(UserLat, UserLng) {
           maxRedirects: 10
         }, function(error, response, body) {
           var cheerio = require('cheerio'),
-          $ = cheerio.load(body);
-          var text = $('.brand').text();          
+          $ = cheerio.load(body);        
           console.log('here');
           console.log(url);
 
@@ -592,7 +591,7 @@ function getClosestLocation(UserLat, UserLng) {
             place.lon = $(this).find('.address').attr('long');
             places.push(place);
           });
-          console.log(places.length);
+          console.log(places);
 
           var OriginLat = UserLat;
           var OriginLong = UserLng;
