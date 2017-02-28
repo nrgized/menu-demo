@@ -80,7 +80,7 @@ app.post('/webhook/', function (req, res) {
 
           }
 
-          if (event.postback.payload === 'search') {
+          if (event.postback.payload === 'select_location') {
             console.log('search');
               askLocation();
           }
