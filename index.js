@@ -41,7 +41,10 @@ app.post('/webhook/', function (req, res) {
         if (event.postback && event.postback.payload) {
 
           // check for postback cases
-
+          if (event.postback.payload === 'select_location') {
+            console.log('select_location');
+            askLocation();
+          }
 
           if (event.postback.payload === 'select_type') {
             console.log('select_type');
@@ -103,24 +106,22 @@ app.post('/webhook/', function (req, res) {
         }  
        
 // quick reply payload handled
-/*
-          if (event.message && event.message.quick_reply && event.message.quick_reply.payload === 'french') {
-            userOptions[sender] = {id: sender, type: "french"};
-            askLocation();
+
+          if (event.message && event.message.quick_reply && event.message.quick_reply.payloa ) {
+            if (event.message.quick_reply.payload === 'french') {
+              userOptions[sender] = {id: sender, type: "french"};
+              askLocation();
+            }            
+            if (event.message.quick_reply.payload === 'american') {
+              userOptions[sender] = {id: sender, type: "american"};
+              askLocation();
+            }
+            if (event.message.quick_reply.payload === 'american') {
+              userOptions[sender] = {id: sender, type: "american"};
+              askLocation();
+            }
           }
-          if (event.message && event.message.quick_reply && event.message.quick_reply.payload === 'american') {
-            userOptions[sender] = {id: sender, type: "american"};
-            askLocation();
-          }
-          if (event.message && event.message.quick_reply && event.message.quick_reply.payload === 'italian') {
-            userOptions[sender] = {id: sender, type: "italian"};
-            askLocation();
-          }
-          if (event.message && event.message.quick_reply && event.message.quick_reply.payload === 'select_location') {
-            console.log('search');
-            askLocation();
-          }
-*/
+
 // message text handler
 
 
