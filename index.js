@@ -73,22 +73,7 @@ app.post('/webhook/', function (req, res) {
                   }; 
                   callSendAPI(messageData);
           }
-          if (event.postback.payload === 'french') {
-            userOptions[sender] = {id: sender, type: "french"};
-            askLocation();
-          }
-          if (event.postback.payload === 'american') {
-            userOptions[sender] = {id: sender, type: "american"};
-            askLocation();
-          }
-          if (event.postback.payload === 'italian') {
-            userOptions[sender] = {id: sender, type: "italian"};
-            askLocation();
-          }
-          if (event.postback.payload === 'select_location') {
-            console.log('search');
-            askLocation();
-          }
+
 
         }
 // handle attachment
@@ -117,8 +102,27 @@ app.post('/webhook/', function (req, res) {
           }
         }  
        
+// quick reply payload handled
 
-// end of location check
+          if (event.message.quick_reply.payload === 'french') {
+            userOptions[sender] = {id: sender, type: "french"};
+            askLocation();
+          }
+          if (event.message.quick_reply.payload === 'american') {
+            userOptions[sender] = {id: sender, type: "american"};
+            askLocation();
+          }
+          if (event.message.quick_reply.payload === 'italian') {
+            userOptions[sender] = {id: sender, type: "italian"};
+            askLocation();
+          }
+          if (event.message.quick_reply.payload === 'select_location') {
+            console.log('search');
+            askLocation();
+          }
+
+// message text handler
+
 
         if (event.message && event.message.text) {
             text = event.message.text;
