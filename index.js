@@ -43,46 +43,51 @@ app.post('/webhook/', function (req, res) {
           // check for postback cases
 
 
-          if (event.postback.payload === 'select') {
-            console.log('select');
+          if (event.postback.payload === 'select_type') {
+            console.log('select_type');
 
                   var messageData = {
                     "recipient":{
                       "id": sender
                     },
                     "message":{
-                      "text":"Pasirink automobilio tipa",
+                      "text":"Pasirink virtuvės tipą",
                       "quick_replies":[
                         {
                           "content_type":"text",
-                          "title":"Praktiški",
-                          "payload":"selectpractical"
+                          "title":"Prancūziška",
+                          "payload":"french"
                         },
                         {
                           "content_type":"text",
-                          "title":"Komfortiški",
-                          "payload":"selectcomfort"
+                          "title":"Amerikietiška",
+                          "payload":"american"
                         },     
                         {
                           "content_type":"text",
-                          "title":"Krovininiai",
-                          "payload":"selectcargo"
-                        },
-                        {
-                          "content_type":"text",
-                          "title":"Rinktiniai",
-                          "payload":"selectpremium"
+                          "title":"Itališka",
+                          "payload":"italian"
                         }
                       ]
                     }
                   }; 
                   callSendAPI(messageData);
-
           }
-
+          if (event.postback.payload === 'french') {
+            userOptions[sender] = {id: sender, type: "french"};
+            askLocation();
+          }
+          if (event.postback.payload === 'american') {
+            userOptions[sender] = {id: sender, type: "american"};
+            askLocation();
+          }
+          if (event.postback.payload === 'italian') {
+            userOptions[sender] = {id: sender, type: "italian"};
+            askLocation();
+          }
           if (event.postback.payload === 'select_location') {
             console.log('search');
-              askLocation();
+            askLocation();
           }
 
         }
@@ -227,75 +232,9 @@ app.post('/webhook/', function (req, res) {
     res.sendStatus(200);
 });
 
-// function to send GET request and parse stop names
-function getStopsData() {
-  var url = 'https://login.citybee.lt/lt/';
-  request({
-    headers: {
-      'Cookie': 'PHPSESSID=8m3an6jv3vtmurj9pv1u9a0od3; device_view=full; BCSI-CS-97976de0be87e764=2; BIGipServerglosC-proxyVIP-bc-RBB-web_gdcsfscs05-55_8050_pool=3242406179.29215.0000; _ga=GA1.2.500491733.1468570414; BCSI-CS-b933f65a4f518259=2; BIGipServerSlough-proxyVIP-bc-RBB-web-SLGSFSCS105-155_8050_pool=3778638102.29215.0000; __utmt=1; __utma=269912044.500491733.1468570414.1468570425.1468587689.2; __utmb=269912044.4.10.1468587689; __utmc=269912044; __utmz=269912044.1468587689.2.2.utmcsr=citybee.lt|utmccn=(referral)|utmcmd=referral|utmcct=/lt/'
-    },
-    uri: url,
-    method: "POST",
-    timeout: 10000,
-    followRedirect: true,
-    maxRedirects: 10
-  }, function (error, response, body) {
-    if (!error && response.statusCode == 200) {
-      // acction on HTTP request success
-
-      console.log('http success');
-
-      // parse html
-      var cheerio = require('cheerio'),
-      $ = cheerio.load(body);
-        var script = $('script:contains("var opts")').html();
-        
-        script = script.substring(script.indexOf("var opts = {") + 11);
-        script = script.substring(0, script.indexOf(";"));
-        var carlocationsString = script.substring(script.indexOf("carslocations: [") + 14);
-        carlocationsString = carlocationsString.substring(0, carlocationsString.indexOf("bicycleZonesLocations"));
-        carlocationsString = carlocationsString.substring(0, carlocationsString.lastIndexOf(","));
-        var carlocations = JSON.parse(carlocationsString);
-       //console.log(carlocations[300].lat); 
-      // loop through car locations
-
-
-/* loop through zones
-      $( "ul.zones-list" ).children().each(function(i, elem) {
-        var zone = {};
-        if($(this).find('.zone-details').length != 0)  {
-          zone.nameFull = $(this).find( ".zone-details" ).attr('title');
-          var nameLT = zone.nameFull.replace(/[`„“~!@#$%^&*()_|+\-=?;:'",.<>\{\}\[\]\\\/]/gi, '');
-          zone.nameLT = nameLT.toLowerCase();
-          var nameEN = zone.nameLT.replace(/ą/gi,'a').replace(/č/gi, 'c').replace(/ę|ė/gi, 'e').replace(/į/gi, 'i').replace(/š/gi, 's').replace(/ų|ū/gi, 'u').replace(/ž/gi, 'z').replace(/"/gi, '');
-          zone.nameEN = nameEN.toLowerCase();
-          zone.id = $(this).find( "input[name*='zone-id']" ).attr('value');
-          zone.index = $(this).find( "input[name*='zone-id']" ).attr('value');
-          //console.log(id + " " + name);
-          zones.push(zone);
-          //queryStringValues += "(" + zone.index + ", '" + zone.nameLT + "', '" + zone.nameEN + "', " + zone.id + "), ";
-        }
-        else {
-          //console.log ('no zones');
-        }
-   
-
-      });
-      console.log ('end of loop');
-
-*/
-        
-    } else {
-        // http request failing
-      console.error("error on request");
-      console.log('error');
-    }
-  }); 
-
-}
 
 // find nearest car
-
+/*
 function getNearestCars(UserLat, UserLng) {
   var url = 'https://login.citybee.lt/lt/';
 
@@ -558,8 +497,8 @@ function getNearestCars(UserLat, UserLng) {
   }); 
 
 }
-
-// get info
+*/
+// get getClosestLocation
 
 function getClosestLocation(UserLat, UserLng) {
   var url = "http://baranovas.lt/data.html";
@@ -592,6 +531,33 @@ function getClosestLocation(UserLat, UserLng) {
         places.push(place);
         place = {};
       });
+
+      // check if type was selected and slice array
+
+      if (typeof userOptions[sender] != 'undefined') {
+        if (userOptions[sender].hasOwnProperty("type")) {
+          var type = userOptions[sender].type;
+          if (type) {
+            for (i=0; i<places.length; i++) {
+              if(places[i].type.indexOf(type) < 0) {
+              places.splice(i,1);
+              i = i - 1;
+              } 
+              else {
+
+              } 
+            }
+          delete userOptions[sender].type;
+          }
+        }
+      }
+      
+
+
+
+      // distance calculation
+
+
       var OriginLat = UserLat;
       var OriginLong = UserLng;
       var p = 0.017453292519943295;    // Math.PI / 180
