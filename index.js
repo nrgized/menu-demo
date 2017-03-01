@@ -104,19 +104,19 @@ app.post('/webhook/', function (req, res) {
        
 // quick reply payload handled
 
-          if (event.message.quick_reply && event.message.quick_reply.payload === 'french') {
+          if (event.message && event.message.quick_reply && event.message.quick_reply.payload === 'french') {
             userOptions[sender] = {id: sender, type: "french"};
             askLocation();
           }
-          if (event.message.quick_reply && event.message.quick_reply.payload === 'american') {
+          if (event.message && event.message.quick_reply && event.message.quick_reply.payload === 'american') {
             userOptions[sender] = {id: sender, type: "american"};
             askLocation();
           }
-          if (event.message.quick_reply && event.message.quick_reply.payload === 'italian') {
+          if (event.message && event.message.quick_reply && event.message.quick_reply.payload === 'italian') {
             userOptions[sender] = {id: sender, type: "italian"};
             askLocation();
           }
-          if (event.message.quick_reply && event.message.quick_reply.payload === 'select_location') {
+          if (event.message && event.message.quick_reply && event.message.quick_reply.payload === 'select_location') {
             console.log('search');
             askLocation();
           }
