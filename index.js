@@ -103,7 +103,7 @@ app.post('/webhook/', function (req, res) {
         }  
        
 // quick reply payload handled
-
+/*
           if (event.message && event.message.quick_reply && event.message.quick_reply.payload === 'french') {
             userOptions[sender] = {id: sender, type: "french"};
             askLocation();
@@ -120,7 +120,7 @@ app.post('/webhook/', function (req, res) {
             console.log('search');
             askLocation();
           }
-
+*/
 // message text handler
 
 
