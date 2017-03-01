@@ -107,7 +107,7 @@ app.post('/webhook/', function (req, res) {
        
 // quick reply payload handled
 
-          if (event.message && event.message.quick_reply && event.message.quick_reply.payloa ) {
+          if (event.message && event.message.quick_reply && event.message.quick_reply.payload ) {
             if (event.message.quick_reply.payload === 'french') {
               userOptions[sender] = {id: sender, type: "french"};
               askLocation();
