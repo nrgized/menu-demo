@@ -748,7 +748,7 @@ function getClosestLocation(UserLat, UserLng) {
           for (i = 0; i < places.length; i++) {
            console.log(places[i].title);
             element = {
-                title: 'asdf', //places[i].title,
+                title: places[i].title,
                 subtitle: places[i].address + ' (' + places[i].walkdistance + ' )',
                 item_url: places[i].fblink,            
                 image_url: places[i].img,
