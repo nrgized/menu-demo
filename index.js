@@ -314,9 +314,43 @@ app.post('/webhook/', function (req, res) {
                 }
             continue
             }
-            if (text === 'bee') {
-                console.log('bee');
-                getStopsData();
+            if (text === 'jau' || 
+                text.indexOf('isalkau') >= 0 || 
+                text.indexOf('išalkau') >= 0 || 
+                text.indexOf('išalkęs') >= 0 || 
+                text.indexOf('išalkes') >= 0 ||
+                text.indexOf('isalkęs') >= 0 ||
+                text.indexOf('isalkes') >= 0 ||
+                text.indexOf('alkanas') >= 0 || )
+                {
+                console.log('jau');
+                var messageData = {
+                    "recipient":{
+                      "id": sender
+                    },
+                    "message":{
+                      "text":"Pagal ką rinksies kur valgyti?",
+                      "quick_replies":[
+                        {
+                          "content_type":"text",
+                          "title":"Kas arčiausiai?",
+                          "payload":"select_location"
+                        },
+                        {
+                          "content_type":"text",
+                          "title":"Pagal virtuvės tipą",
+                          "payload":"select_type"
+                        },     
+                        {
+                          "content_type":"text",
+                          "title":"Pagal kainą",
+                          "payload":"select_price"
+                        }
+                      ]
+                    }
+                  }; 
+                  callSendAPI(messageData);        
+            }
             continue
             }
             if (text === 'zones') {
