@@ -321,7 +321,7 @@ app.post('/webhook/', function (req, res) {
                 text.indexOf('išalkes') >= 0 ||
                 text.indexOf('isalkęs') >= 0 ||
                 text.indexOf('isalkes') >= 0 ||
-                text.indexOf('alkanas') >= 0 || )
+                text.indexOf('alkanas') >= 0 )
                 {
                 console.log('jau');
                 var messageData = {
