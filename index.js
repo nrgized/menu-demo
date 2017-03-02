@@ -646,7 +646,7 @@ function getClosestLocation(UserLat, UserLng) {
       $('div .place-item').each(function(i, elem) {
         place.title = $(this).find('.title').text();
         place.price = $(this).find('.pricerange').text();
-        place.type = $(this).find('.type').text();
+        place.type = $(this).find('.type').attr('type');
         place.address = $(this).find('.address').text();
         place.fblink = $(this).find('.fblink').attr('href');
         place.img = $(this).find('.img').attr('src');
@@ -1033,7 +1033,7 @@ function getHTTPinfo(sender) {
           $('div .place-item').each(function(i, elem) {
             place.title = $(this).find('.title').text();
             place.price = $(this).find('.pricerange').text();
-            place.type = $(this).find('.type').text();
+            place.type = $(this).find('.type').attr('type');
             place.address = $(this).find('.address').text();
             place.fblink = $(this).find('.fblink').attr('href');
             place.img = $(this).find('.img').attr('src');
