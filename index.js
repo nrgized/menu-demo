@@ -46,6 +46,31 @@ app.post('/webhook/', function (req, res) {
             askLocation();
           }
 
+          if (event.postback.payload === 'get_started') {
+            console.log('get_started');
+            var messageData = {
+                "recipient":{
+                  "id": sender
+                },
+                "message":{
+                  "text":"Are jau laikas valgyti?",
+                  "quick_replies":[
+                    {
+                      "content_type":"text",
+                      "title":"Taip",
+                      "payload":"select_yes"
+                    },
+                    {
+                      "content_type":"text",
+                      "title":"Ne",
+                      "payload":"select_no"
+                    },     
+                  ]
+                }
+              }; 
+            callSendAPI(messageData);
+          }
+
           if (event.postback.payload === 'select_type') {
             console.log('select_type');
 
@@ -70,6 +95,37 @@ app.post('/webhook/', function (req, res) {
                           "content_type":"text",
                           "title":"Itališka",
                           "payload":"italian"
+                        }
+                      ]
+                    }
+                  }; 
+                  callSendAPI(messageData);
+          }
+          
+          if (event.postback.payload === 'select_price') {
+            console.log('select_price');
+
+                  var messageData = {
+                    "recipient":{
+                      "id": sender
+                    },
+                    "message":{
+                      "text":"Pasirink kainą",
+                      "quick_replies":[
+                        {
+                          "content_type":"text",
+                          "title":"$",
+                          "payload":"price1"
+                        },
+                        {
+                          "content_type":"text",
+                          "title":"$$",
+                          "payload":"price2"
+                        },     
+                        {
+                          "content_type":"text",
+                          "title":"$$$",
+                          "payload":"price3"
                         }
                       ]
                     }
@@ -116,24 +172,71 @@ app.post('/webhook/', function (req, res) {
               userOptions[sender] = {id: sender, type: "american"};
               askLocation();
             }
-            if (event.message.quick_reply.payload === 'american') {
-              userOptions[sender] = {id: sender, type: "american"};
+            if (event.message.quick_reply.payload === 'italian') {
+              userOptions[sender] = {id: sender, type: "italian"};
               askLocation();
+            }
+            if (event.message.quick_reply.payload === 'price1') {
+              userOptions[sender] = {id: sender, price: "$"};
+              askLocation();
+            }            
+            if (event.message.quick_reply.payload === 'price2') {
+              userOptions[sender] = {id: sender, price: "$$"};
+              askLocation();
+            }
+            if (event.message.quick_reply.payload === 'price3') {
+              userOptions[sender] = {id: sender, price: "$$$"};
+              askLocation();
+            }
+            if (event.message.quick_reply.payload === 'select_no') {
+              sendTextMessage(sender, "Parašyk mum kada išalksi arba spausk menu");     
+            }
+            if (event.message.quick_reply.payload === 'select_yes') {
+              var messageData = {
+                    "recipient":{
+                      "id": sender
+                    },
+                    "message":{
+                      "text":"Pagal ką rinksies kur valgyti?",
+                      "quick_replies":[
+                        {
+                          "content_type":"text",
+                          "title":"Kas arčiausiai?",
+                          "payload":"select_location"
+                        },
+                        {
+                          "content_type":"text",
+                          "title":"Pagal virtuvės tipą",
+                          "payload":"select_type"
+                        },     
+                        {
+                          "content_type":"text",
+                          "title":"Pagal kainą",
+                          "payload":"select_price"
+                        }
+                      ]
+                    }
+                  }; 
+                  callSendAPI(messageData);        
             }
           }
 
 // message text handler
 
 
-        if (event.message && event.message.text) {
+        if (event.message && !event.message.hasOwnProperty("quick_reply") && event.message.text) {
             text = event.message.text;
             text = text.toLowerCase();
             if (text === 'thread') {
                 changeThreadSettings();
             continue
             }
-            if (text === 'check') {
-                getHTTPinfo(sender);
+            if (text === 'greeting') {
+                changeGreeting();
+            continue
+            }
+            if (text === 'getstarted') {
+                changeGetStarted();
             continue
             }
     
@@ -507,7 +610,11 @@ function getNearestCars(UserLat, UserLng) {
 
 function getClosestLocation(UserLat, UserLng) {
   var url = "http://baranovas.lt/data.html";
-  request({
+  var places = [];
+  var place = {};
+  var element = {};
+  var elements = []; 
+ request({
     uri: url,
     method: "POST",
     timeout: 100000,
@@ -517,13 +624,6 @@ function getClosestLocation(UserLat, UserLng) {
       var cheerio = require('cheerio'),
       $ = cheerio.load(body);        
       console.log('here');
-      console.log(url);
-
-      var places = [];
-      var place = {};
-      var element = {};
-      var elements = [];
-
       $('div .place-item').each(function(i, elem) {
         place.title = $(this).find('.title').text();
         place.price = $(this).find('.pricerange').text();
@@ -542,14 +642,32 @@ function getClosestLocation(UserLat, UserLng) {
       if (typeof userOptions[sender] != 'undefined') {
         if (userOptions[sender].hasOwnProperty("type")) {
           var type = userOptions[sender].type;
+          console.log(type);
           if (type) {
             for (i=0; i<places.length; i++) {
               if(places[i].type.indexOf(type) < 0) {
-              places.splice(i,1);
-              i = i - 1;
+               console.log("drop from array " + places[i].title);
+               places.splice(i,1);
+               i = i - 1;
               } 
-              else {
+            }
+          delete userOptions[sender].type;
+          }
+        }
+      }
+  
+      // check if price was selected and slice array
 
+      if (typeof userOptions[sender] != 'undefined') {
+        if (userOptions[sender].hasOwnProperty("price")) {
+          var price = userOptions[sender].price;
+          console.log(price);
+          if (price) {
+            for (i=0; i<places.length; i++) {
+              if(places[i].price !== price) {
+               console.log("drop from array " + places[i].title);
+               places.splice(i,1);
+               i = i - 1;
               } 
             }
           delete userOptions[sender].type;
@@ -557,9 +675,7 @@ function getClosestLocation(UserLat, UserLng) {
         }
       }
       
-
-
-
+ 
       // distance calculation
 
 
@@ -595,7 +711,11 @@ function getClosestLocation(UserLat, UserLng) {
         // a must be equal to b
         return 0;
         });
+   console.log(places);
+   console.log(places.length);
+  
 
+   
     // run 10 nearest cars through google maps API to identify walking distance
         var googleAPIkey = "AIzaSyBi5yJFId0hOqgw-_gw2R-SQJtqf3zE2hU";
         var Origin = OriginLat + "," + OriginLong;
@@ -629,7 +749,7 @@ function getClosestLocation(UserLat, UserLng) {
             console.log('Google API http success');
             
             var distanceDetails = JSON.parse(body);
-            console.log(distanceDetails);
+            //console.log(distanceDetails);
             // add walking distance to 10 nearest stations if 10 exists
 
             for (i = 0; i < z; i++) {
@@ -659,28 +779,18 @@ function getClosestLocation(UserLat, UserLng) {
           // a must be equal to b
           return 0;
         });
-          console.log(places[0].walkdistanceval);
-          console.log(places[1].walkdistanceval);
-          console.log(places[0].walkdistance);
-          console.log(places[1].walkdistance);
-
-          sendClosestLocations(Origin)
-
-
-          } else {
-              // http request failing
-            console.error("error on API request");
-            console.log('error');
-          }
-        }); 
-
-        function sendClosestLocations(Origin) {
-
+          //console.log(places[0].walkdistanceval);
+          //console.log(places[1].walkdistanceval);
+          //console.log(places[0].walkdistance);
+          //console.log(places[1].walkdistance);
+          console.log(places[0]);
+          console.log(places[0].title);
           var elements = [];
           var element = {};
-          for (i = 0; i < 5; i++) {
+          for (i = 0; i < places.length; i++) {
+           console.log(places[i].title);
             element = {
-                title: places[i].title,
+                title: 'asdf', //places[i].title,
                 subtitle: places[i].address + ' (' + places[i].walkdistance + ' )',
                 item_url: places[i].fblink,            
                 image_url: places[i].img,
@@ -697,9 +807,6 @@ function getClosestLocation(UserLat, UserLng) {
               elements.push(element);
             element = "";
           }
-          
-          // message format
-
           var messageData = {
             recipient: {
               id: sender
@@ -718,7 +825,15 @@ function getClosestLocation(UserLat, UserLng) {
           messageData.message.attachment.payload.elements = elements;  
           //console.log(JSON.stringify(messageData, null, 4));
           callSendAPI(messageData);
-        }
+
+          } else {
+              // http request failing
+            console.error("error on API request");
+            console.log('error');
+          }
+        });
+  
+
     });
 };
 
@@ -780,6 +895,7 @@ function sendTextMessage(sender, text) {
     });
 }
 
+
 function changeThreadSettings() {
 
     request({
@@ -822,6 +938,56 @@ function changeThreadSettings() {
     });
 }
 
+function changeGreeting() {
+
+    request({
+        url: 'https://graph.facebook.com/v2.6/me/thread_settings',
+        qs: {access_token:app.get('page_access_token')},
+        method: 'POST',
+        json: {
+          "setting_type" : "greeting",
+          "greeting" : {
+           "text" : "Tavo maisto gidas"
+          }
+        }
+    }, function(error, response, body) {
+        if (!error && response.statusCode == 200) {
+          console.log('greeting_settings set');
+        }
+        if (error) {
+            console.log('Error sending thread_settings: ', error);
+        } else if (response.body.error) {
+            console.log('Error greeting_settings: ', response.body.error);
+        }
+    });
+}
+
+function changeGetStarted() {
+
+    request({
+        url: 'https://graph.facebook.com/v2.6/me/thread_settings',
+        qs: {access_token:app.get('page_access_token')},
+        method: 'POST',
+        json: {
+          "setting_type" :"call_to_actions",
+          "thread_state" : "new_thread",
+          "call_to_actions" : [
+          {
+            "payload":"get_started"
+          }
+        ]
+        }
+    }, function(error, response, body) {
+        if (!error && response.statusCode == 200) {
+          console.log('getstarted_settings set');
+        }
+        if (error) {
+            console.log('Error sending thread_settings: ', error);
+        } else if (response.body.error) {
+            console.log('Error getstarted_settings: ', response.body.error);
+        }
+    });
+}
 
 
 
