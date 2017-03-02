@@ -239,90 +239,14 @@ app.post('/webhook/', function (req, res) {
                 changeGetStarted();
             continue
             }
-    
-            if (text.charAt(0) == '#') {
-                console.log("groteles");
-                var matches = [];
-                // check for matching zones
-                var value = text.substring(1, 200);
-                
-                
-                for (i = 0; i < zones.length; i++) {
-                  if (zones[i].nameEN.indexOf(value) > 0)
-                  { 
-                    var match = {};
-                    match.id = zones[i].id;
-                    match.nameFull = zones[i].nameFull;
-                    match.nameEN = zones[i].nameEN;
-                    match.nameLT = zones[i].nameLT;
-                    matches.push(match);
-
-                  } 
-                }
-                console.log(matches.length);
-                // action depending on amount of matching zones
-                if (matches.length <= 0) {
-                  sendTextMessage(sender, "stoteles tokiu pavadinimu nera ");
-                }
-                else if (matches.length === 1) {
-                  getHTTPinfo(sender, matches[0].id);
-                }
-                else if (matches.length < 6) {
-                 // sendTextMessage(sender, "pasirinkite is zemiau esanciu stoteliu");
-                  var buttons = [
-                      {
-                        "type":"web_url",
-                        "url":"https://petersapparel.parseapp.com",
-                        "title":"Show Website"
-                      },
-                      {
-                        "type":"postback",
-                        "title":"Start Chatting",
-                        "payload":"USER_DEFINED_PAYLOAD"
-                      }
-                    ];
-               //var button = {};
-               //for (i = 0; i < matches.length; i++) {
-                    var button = {
-                        "type":"web_url",
-                        "url":"https://petersapparel.parseapp.com",
-                        "title":"Show Website"
-                    }
-                    buttons.push(button);
-               //};
-                  var messageData = {
-                    "recipient":{
-                      "id": sender
-                    },
-                    "message":{
-                      "attachment":{
-                        "type":"template",
-                        "payload":{
-                          "template_type":"button",
-                          "text":"What do you want to do next?",
-                          "buttons": buttons
-                        }
-                      }
-                    }
-                  }; 
-                  callSendAPI(messageData);
-                  sendTextMessage(sender, "st" + buttons.length);
-                  sendTextMessage(sender, "st" + buttons[0].type);
-                }
-                else {
-                  sendTextMessage(sender, "stoteliu rast per daug. patisklinkite paieska");
-                }
-            continue
-            }
             if (text === 'jau' || 
-                text.indexOf('isalkau') >= 0 || 
-                text.indexOf('išalkau') >= 0 || 
-                text.indexOf('išalkęs') >= 0 || 
-                text.indexOf('išalkes') >= 0 ||
-                text.indexOf('isalkęs') >= 0 ||
-                text.indexOf('isalkes') >= 0 ||
-                text.indexOf('alkanas') >= 0 )
-                {
+              text.indexOf('isalkau') >= 0 || 
+              text.indexOf('išalkau') >= 0 || 
+              text.indexOf('išalkęs') >= 0 || 
+              text.indexOf('išalkes') >= 0 ||
+              text.indexOf('isalkęs') >= 0 ||
+              text.indexOf('isalkes') >= 0 ||
+              text.indexOf('alkanas') >= 0 ) {
                 console.log('jau');
                 var messageData = {
                     "recipient":{
@@ -350,9 +274,9 @@ app.post('/webhook/', function (req, res) {
                     }
                   }; 
                   callSendAPI(messageData);        
-            }
             continue
             }
+            
             if (text === 'zones') {
                 console.log('zones');
                 console.log(zones);
