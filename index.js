@@ -41,7 +41,7 @@ app.post('/webhook/', function (req, res) {
         if (event.postback && event.postback.payload) {
 
           // check for postback cases
-          if (event.postback.payload === 'select_location') {
+          if (event.postback.payload === 'select_location' || event.message && event.message.quick_reply && event.message.quick_reply.payload && event.message.quick_reply.payload === 'select_location' ) {
             console.log('select_location');
             askLocation();
           }
@@ -257,7 +257,7 @@ app.post('/webhook/', function (req, res) {
                       "quick_replies":[
                         {
                           "content_type":"text",
-                          "title":"Kas arčiausiai?",
+                          "title":"Kas arčiausiai",
                           "payload":"select_location"
                         },
                         {
