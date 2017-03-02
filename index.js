@@ -41,7 +41,7 @@ app.post('/webhook/', function (req, res) {
         if (event.postback && event.postback.payload) {
 
           // check for postback cases
-          if (event.postback.payload === 'select_location' || event.message && event.message.quick_reply && event.message.quick_reply.payload && event.message.quick_reply.payload === 'select_location') {
+          if (event.postback.payload === 'select_location') {
             console.log('select_location');
             askLocation();
           }
@@ -164,6 +164,67 @@ app.post('/webhook/', function (req, res) {
 // quick reply payload handled
 
           if (event.message && event.message.quick_reply && event.message.quick_reply.payload ) {
+            
+            if (event.message.quick_reply.payload === 'select_location') {
+              askLocation();
+            }
+            if (event.message.quick_reply.payload === 'select_type') {
+             var messageData = {
+                  "recipient":{
+                    "id": sender
+                  },
+                  "message":{
+                    "text":"Pasirink virtuvės tipą",
+                    "quick_replies":[
+                      {
+                        "content_type":"text",
+                        "title":"Prancūziška",
+                        "payload":"french"
+                      },
+                      {
+                        "content_type":"text",
+                        "title":"Amerikietiška",
+                        "payload":"american"
+                      },     
+                      {
+                        "content_type":"text",
+                        "title":"Itališka",
+                        "payload":"italian"
+                      }
+                    ]
+                  }
+                }; 
+                callSendAPI(messageData);
+            }
+            if (event.message.quick_reply.payload === 'select_price') {
+              var messageData = {
+                "recipient":{
+                  "id": sender
+                },
+                "message":{
+                  "text":"Pasirink kainą",
+                  "quick_replies":[
+                    {
+                      "content_type":"text",
+                      "title":"$",
+                      "payload":"price1"
+                    },
+                    {
+                      "content_type":"text",
+                      "title":"$$",
+                      "payload":"price2"
+                    },     
+                    {
+                      "content_type":"text",
+                      "title":"$$$",
+                      "payload":"price3"
+                    }
+                  ]
+                }
+              }; 
+              callSendAPI(messageData);
+            }
+
             if (event.message.quick_reply.payload === 'french') {
               userOptions[sender] = {id: sender, type: "french"};
               askLocation();
