@@ -770,7 +770,13 @@ function getClosestLocation(UserLat, UserLng) {
                   type: "web_url",
                   url: places[i].fblink,    
                   title: "Rezervuoti"
-                }, {
+                }, 
+                {
+                  type: "postback",
+                  title: "Meniu",
+                  payload: "select_food_menu"
+                },
+                {
                   type: "web_url",
                   url: 'https://www.google.com/maps/dir/' + Origin + '/' + places[i].lat + "," + places[i].lon + '/data=!4m2!4m1!3e2',
                   title: "Keliauti",
